@@ -68,4 +68,22 @@ contract TestMyToken is Test {
         assertEq(myToken.balanceOf(user2), 50 ether); // user2 get 50 tokens
         assertEq(myToken.allowance(msg.sender, user1), 50 ether); // since user1 spent 50 token, allowance reduced to 50 tokens from 100
     }
+
+    function testShouldFailIfNotEnoughtAllowance() public {
+        vm.prank(msg.sender);
+        myToken.approve(user1, 100 ether);
+
+        vm.expectRevert(bytes("ERC20: insufficient allowance"));
+        vm.prank(user1);
+        myToken.transferFrom(msg.sender, user2, 500 ether);
+    }
+
+    function testShouldFailIfTransferAmtExceedsFromBalance() public {
+        vm.prank(msg.sender);
+        myToken.approve(user1, 2000 ether); // approving token which is more than msg.sender balance
+
+        vm.prank(user1);
+        vm.expectRevert(bytes("ERC20: transfer amount exceeds balance"));
+        myToken.transferFrom(msg.sender, user2, 2000 ether); // trying to transfer 2000 token from msg.sender whose balance is only 1000 token
+    }
 }
