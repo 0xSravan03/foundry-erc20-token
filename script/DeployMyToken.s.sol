@@ -15,4 +15,4 @@ contract DeployMyToken is Script {
 
         return myToken;
     }
-} 
+}
